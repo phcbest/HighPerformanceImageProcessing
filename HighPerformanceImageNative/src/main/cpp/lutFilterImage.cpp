@@ -9,7 +9,7 @@
 jobject createBitmap(JNIEnv *pEnv, int width, int height);
 
 jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lut_bitmap) {
-// 获取 Bitmap 对象的信息
+    // 获取 Bitmap 对象的信息
     AndroidBitmapInfo bitmapInfo;
     if (AndroidBitmap_getInfo(pEnv, bitmap, &bitmapInfo) < 0) {
         return nullptr;
@@ -44,7 +44,7 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     }
 
     // 创建一个新的 Bitmap 对象
-    jobject newBitmap = createBitmap(pEnv, bitmapInfo.width, bitmapInfo.height);
+    jobject newBitmap = createBitmap(pEnv, (int) bitmapInfo.width, (int) bitmapInfo.height);
 
     // 获取新的 Bitmap 对象的像素数组
     uint32_t *dstPixels;
@@ -62,21 +62,23 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             uint8_t srcR = (srcPixel >> 16) & 0xff;
             uint8_t srcG = (srcPixel >> 8) & 0xff;
             uint8_t srcB = srcPixel & 0xff;
+            // 将颜色通道值转换为百分比
+            float srcRPercent = (float) srcR / 255.0f;
+            float srcGPercent = (float) srcG / 255.0f;
+            float srcBPercent = (float) srcB / 255.0f;
+            // 计算在 LUT 表中的位置
+            int rPos = static_cast<int>(srcRPercent * 7);
+            int gPos = static_cast<int>(srcGPercent * 7);
+            int bPos = static_cast<int>(srcBPercent * 7);
 
-            // 获取 LUT 像素值
-            uint32_t lutPixelR = lutPixels[srcR];
-            uint32_t lutPixelG = lutPixels[srcG];
-            uint32_t lutPixelB = lutPixels[srcB];
+            uint32_t pos = bPos * 512 * 512 + gPos * 512 + rPos;
 
-            // 分离 LUT 像素的颜色通道
-            uint8_t lutR = (lutPixelR >> 16) & 0xff;
-            uint8_t lutG = (lutPixelG >> 8) & 0xff;
-            uint8_t lutB = lutPixelB & 0xff;
-
-            // 将原始像素映射到 LUT 上
-            uint32_t dstPixel = (srcPixel & 0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+            // 在 LUT 表中查找对应的像素值
+            uint32_t lutPixel = lutPixels[pos];
 
             // 将处理后的像素值存储到新的 Bitmap 对象中
+            uint32_t dstPixel =
+                    (srcPixel & 0xff000000) | (lutPixel << 16) | (lutPixel << 8) | lutPixel;
             dstPixels[y * bitmapInfo.width + x] = dstPixel;
         }
     }
