@@ -64,12 +64,14 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             uint8_t srcB = srcPixel & 0xff;
 
             // 获取 LUT 像素值
-            uint32_t lutPixel = lutPixels[srcR];
+            uint32_t lutPixelR = lutPixels[srcR];
+            uint32_t lutPixelG = lutPixels[srcG];
+            uint32_t lutPixelB = lutPixels[srcB];
 
             // 分离 LUT 像素的颜色通道
-            uint8_t lutR = (lutPixel >> 16) & 0xff;
-            uint8_t lutG = (lutPixel >> 8) & 0xff;
-            uint8_t lutB = lutPixel & 0xff;
+            uint8_t lutR = (lutPixelR >> 16) & 0xff;
+            uint8_t lutG = (lutPixelG >> 8) & 0xff;
+            uint8_t lutB = lutPixelB & 0xff;
 
             // 将原始像素映射到 LUT 上
             uint32_t dstPixel = (srcPixel & 0xff000000) | (lutR << 16) | (lutG << 8) | lutB;

@@ -9,8 +9,13 @@ object ImageHelper {
     fun getHasPixelRectSize(bitmap: Bitmap): Rect {
         return nativeLib.getImageMinPixelSize(bitmap)
     }
-    fun getHasPixelRectSize(bitmap: Bitmap,precision: Int): Rect {
-        return nativeLib.getImageMinPixelSizePrecisionControl(bitmap,precision)
+
+    fun getHasPixelRectSize(bitmap: Bitmap, precision: Int): Rect {
+        return nativeLib.getImageMinPixelSizePrecisionControl(bitmap, precision)
+    }
+
+    fun getLutFilterImage(bitmap: Bitmap, lutBitmap: Bitmap): Bitmap {
+        return nativeLib.getLutFilterImage(bitmap, lutBitmap)
     }
 
 

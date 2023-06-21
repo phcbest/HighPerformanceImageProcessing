@@ -8,7 +8,7 @@ internal class NativeLib {
     external fun getImageMinPixelSize(bitmap: Bitmap): Rect
     external fun getImageMinPixelSizePrecisionControl(bitmap: Bitmap, precision: Int): Rect
 
-//    external fun getLutFilterImage(bitmap: Bitmap, lutBitmap: Bitmap): Bitmap
+    external fun getLutFilterImage(bitmap: Bitmap, lutBitmap: Bitmap): Bitmap
 
     companion object {
         init {
