@@ -7,6 +7,7 @@ project("highperformanceimagenative")
 add_library(
         highperformanceimagenative SHARED
         highperformanceimagenative.cpp
+        lutFilterImage.cpp
         imageMinPixelSize.cpp)
 
 find_library(
