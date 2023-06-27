@@ -37,7 +37,7 @@ public class LUTImage {
                                           CoordinateToColor.Type coordinateToColorType,
                                           LutAlignment.Mode lutAlignmentMode) {
         final int lutWidth = lutBitmap.getWidth();
-        int lutColors[] = new int[lutWidth * lutBitmap.getHeight()];
+        int[] lutColors = new int[lutWidth * lutBitmap.getHeight()];
         lutBitmap.getPixels(lutColors, 0, lutWidth, 0, 0, lutWidth, lutBitmap.getHeight());
         LUTImage lutImage = new LUTImage(lutWidth, lutBitmap.getHeight(), lutColors,
                 coordinateToColorType, lutAlignmentMode);

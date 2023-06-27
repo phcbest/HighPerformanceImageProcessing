@@ -13,13 +13,13 @@ public class CreatingNewBitmap implements BitmapStrategy {
         int mWidth = src.getWidth();
         int mHeight = src.getHeight();
         int[] pix = new int[mWidth * mHeight];
+        //原图复制到pix数组中
         src.getPixels(pix, 0, mWidth, 0, 0, mWidth, mHeight);
 
         for (int y = 0; y < mHeight; y++) {
             for (int x = 0; x < mWidth; x++) {
                 int index = y * mWidth + x;
                 int pixel = pix[index];
-
                 pix[index] = lutImage.getColorPixelOnLut(pixel);
             }
         }

@@ -55,18 +55,32 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     // 映射原始像素数组到 LUT 上
     for (int y = 0; y < bitmapInfo.height; y++) {
         for (int x = 0; x < bitmapInfo.width; x++) {
+            //计算index
+            uint32_t index = y * bitmapInfo.width + x;
             // 获取原始像素值
-            uint32_t srcPixel = srcPixels[y * bitmapInfo.width + x];
-
+            uint32_t srcPixel = srcPixels[index];
             // 分离原始像素的颜色通道
             uint8_t srcR = (srcPixel >> 16) & 0xff;
             uint8_t srcG = (srcPixel >> 8) & 0xff;
             uint8_t srcB = srcPixel & 0xff;
-
+            //计算lut的index
+            int pointX = 1;
+            int pointY = 1;
+            int pointZ = 1;
+            int lutX = 1;
+            int lutY = 1;
+            //根据lut的坐标计算lut的Index
+            uint32_t lutIndex = lutY + lutBitmapInfo.width + lutX;
+            //计算lut的rgb
+            uint8_t lutR = lutPixels[lutIndex] >> 16 & 0xff;
+            uint8_t lutG = lutPixels[lutIndex] >> 8 & 0xff;
+            uint8_t lutB = lutPixels[lutIndex] & 0xff;
             // 将处理后的像素值存储到新的 Bitmap 对象中
             uint32_t dstPixel =
-                    (srcPixel & 0xff000000) | (srcR << 16) | (srcG << 8) | srcB;
-            dstPixels[y * bitmapInfo.width + x] = dstPixel;
+                    (srcPixel & 0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+//            uint32_t dstPixel =
+//                    (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+            dstPixels[index] = dstPixel;
         }
     }
 
