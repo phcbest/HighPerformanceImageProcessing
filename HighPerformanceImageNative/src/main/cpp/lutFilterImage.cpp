@@ -92,6 +92,13 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     return newBitmap;
 }
 
+/**
+ * 创建位图
+ * @param pEnv
+ * @param width
+ * @param height
+ * @return
+ */
 jobject createBitmap(JNIEnv *pEnv, int width, int height) {
     // 获取 Bitmap 类
     jclass bitmapClass = pEnv->FindClass("android/graphics/Bitmap");
