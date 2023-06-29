@@ -1,6 +1,8 @@
 package org.phcbest.highperformanceimagenative.easylut.lutimage;
 
 
+import android.util.Log;
+
 public interface LutAlignment {
 
     String TAG = LutAlignment.class.getSimpleName();
@@ -10,6 +12,9 @@ public interface LutAlignment {
     int getY(int rowDepth, int sideSize, int x, int y, int z);
 
     class Square implements LutAlignment {
+        public Square() {
+            Log.i(TAG, "Square");
+        }
 
         @Override
         public int getX(int rowDepth, int sideSize, int x, int y, int z) {
@@ -24,6 +29,9 @@ public interface LutAlignment {
     }
 
     class Hald implements LutAlignment {
+        public Hald() {
+            Log.i(TAG, "Hald");
+        }
 
         @Override
         public int getX(int rowDepth, int sideSize, int x, int y, int z) {

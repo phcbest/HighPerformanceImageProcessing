@@ -5,8 +5,17 @@
 #include "lutFilterImage.h"
 #include <jni.h>
 #include <android/bitmap.h>
+#include <cmath>
 
 jobject createBitmap(JNIEnv *pEnv, int width, int height);
+
+uint32_t calculateSideSize(AndroidBitmapInfo lutBitmap);
+
+uint32_t getX(uint32_t rowDepth, uint32_t sideSize, uint32_t x, uint32_t y, uint32_t z);
+
+uint32_t getY(uint32_t rowDepth, uint32_t sideSize, uint32_t x, uint32_t y, uint32_t z);
+
+uint32_t COLOR_DEPTH = 256;
 
 jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lut_bitmap) {
     // 获取 Bitmap 对象的信息
@@ -51,7 +60,10 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     if (AndroidBitmap_lockPixels(pEnv, newBitmap, (void **) &dstPixels) < 0) {
         return nullptr;
     }
-
+    uint32_t sideSize = calculateSideSize(lutBitmapInfo);
+    uint32_t rgbDistortion = (COLOR_DEPTH / sideSize);
+    uint32_t rowDepth = lutBitmapInfo.height / sideSize;
+    uint32_t columnDepth = lutBitmapInfo.width / sideSize;
     // 映射原始像素数组到 LUT 上
     for (int y = 0; y < bitmapInfo.height; y++) {
         for (int x = 0; x < bitmapInfo.width; x++) {
@@ -63,12 +75,12 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             uint8_t srcR = (srcPixel >> 16) & 0xff;
             uint8_t srcG = (srcPixel >> 8) & 0xff;
             uint8_t srcB = srcPixel & 0xff;
-            //计算lut的index
-            int pointX = 1;
-            int pointY = 1;
-            int pointZ = 1;
-            int lutX = 1;
-            int lutY = 1;
+            //计算lut的index,进行了越界判断
+            uint32_t pointX = srcR / rgbDistortion;
+            uint32_t pointY = srcG / rgbDistortion;
+            uint32_t pointZ = srcB / rgbDistortion;
+            uint32_t lutX = getX(rowDepth, sideSize, pointX, pointY, pointZ);
+            uint32_t lutY = getY(rowDepth, sideSize, pointX, pointY, pointZ);
             //根据lut的坐标计算lut的Index
             uint32_t lutIndex = lutY + lutBitmapInfo.width + lutX;
             //计算lut的rgb
@@ -90,6 +102,43 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     AndroidBitmap_unlockPixels(pEnv, newBitmap);
 
     return newBitmap;
+}
+
+/**
+ * 相等情况下X
+ * @return
+ */
+uint32_t getX(uint32_t rowDepth, uint32_t sideSize, uint32_t x, uint32_t y, uint32_t z) {
+    return ((rowDepth == 1) ? z : z % rowDepth) * sideSize + x;
+}
+
+
+/**
+ * 相等情况下Y
+ * @return
+ */
+uint32_t getY(uint32_t rowDepth, uint32_t sideSize, uint32_t x, uint32_t y, uint32_t z) {
+    return (rowDepth == 1 ? 0 : z / rowDepth) * sideSize + y;
+}
+
+
+/**
+ * 获得侧面尺寸
+ * @return
+ */
+uint32_t calculateSideSize(AndroidBitmapInfo lutBitmap) {
+    bool isLutSquare = (lutBitmap.width == lutBitmap.height);
+    if (isLutSquare) {
+        double lutRoot = std::pow(lutBitmap.width * lutBitmap.width, 1.0 / 3.0);
+        return static_cast<int>(std::round(lutRoot));
+    }
+    uint32_t smallerSide =
+            lutBitmap.width > lutBitmap.height ? lutBitmap.height : lutBitmap.width;
+    uint32_t longerSide =
+            lutBitmap.width > lutBitmap.height ? lutBitmap.width : lutBitmap.height;
+
+    double lutRoot = std::pow(smallerSide * longerSide, 1.0 / 3.0);
+    return static_cast<uint32_t>(std::round(lutRoot));
 }
 
 /**
@@ -128,5 +177,6 @@ jobject createBitmap(JNIEnv *pEnv, int width, int height) {
     }
 
     // 调用 Bitmap.createBitmap() 方法创建一个新的 Bitmap 对象
-    return pEnv->CallStaticObjectMethod(bitmapClass, createBitmapMethod, width, height, argb8888);
+    return pEnv->CallStaticObjectMethod(bitmapClass, createBitmapMethod, width, height,
+                                        argb8888);
 }
