@@ -14,4 +14,8 @@ object ImageHelper {
         return nativeLib.getImageMinPixelSizePrecisionControl(bitmap, precision)
     }
 
+    fun getImageByLutFilter(bitmap: Bitmap, lutBitmap: Bitmap): Bitmap {
+        return nativeLib.getLutFilterImage(bitmap, lutBitmap)
+    }
+
 }
