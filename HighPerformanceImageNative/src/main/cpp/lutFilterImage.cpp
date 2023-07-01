@@ -88,10 +88,10 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             uint8_t lutG = lutPixels[lutIndex] >> 8 & 0xff;
             uint8_t lutB = lutPixels[lutIndex] & 0xff;
             // 将处理后的像素值存储到新的 Bitmap 对象中
-            uint32_t dstPixel =
-                    (srcPixel & 0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
 //            uint32_t dstPixel =
-//                    (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+//                    (srcPixel & 0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+            uint32_t dstPixel =
+                    (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
             dstPixels[index] = dstPixel;
         }
     }

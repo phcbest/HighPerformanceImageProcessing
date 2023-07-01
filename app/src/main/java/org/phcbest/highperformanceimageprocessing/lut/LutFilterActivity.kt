@@ -24,7 +24,7 @@ class LutFilterActivity : AppCompatActivity() {
         val applyFilterImage = ImageHelper.getImageByLutFilter(
             testImage, BitmapFactory.decodeResource(
                 this.resources,
-                R.mipmap.test_lut
+                R.mipmap.filter_square_8_nintendo
             )
         )
         findViewById<ImageView>(R.id.iv_origin).setImageBitmap(testImage)
