@@ -119,7 +119,7 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             // 将处理后的像素值存储到新的 Bitmap 对象中
             uint32_t dstPixel = srcPixel;
 //            uint32_t dstPixel = (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
-            if (x > 0 && x < 1440 && y > 100 && y < 500) {
+            if (x > 100 && x < 500 && y > 100 && y < 500) {
                 dstPixel = 0xff000000;
             }
 

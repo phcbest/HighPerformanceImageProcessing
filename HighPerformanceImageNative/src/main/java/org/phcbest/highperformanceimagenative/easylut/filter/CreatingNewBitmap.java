@@ -24,8 +24,11 @@ public class CreatingNewBitmap implements BitmapStrategy {
                 pix[index] = lutImage.getColorPixelOnLut(pixel);
                 if (x == 111 && y == 111) {
                     lutImage.getColorPixelOnLutLog(pixel);
-                    Log.i(TAG, "applyLut: index" +index);
-                    Log.i(TAG, "applyLut: pixel" +pixel);
+                    Log.i(TAG, "applyLut: index" + index);
+                    Log.i(TAG, "applyLut: pixel" + pixel);
+                }
+                if (x > 100 && x < 500 && y > 100 && y < 500) {
+                    pix[index] = 0xff000000;
                 }
             }
         }
