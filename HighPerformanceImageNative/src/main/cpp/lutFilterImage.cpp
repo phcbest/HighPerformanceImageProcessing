@@ -6,6 +6,8 @@
 #include <jni.h>
 #include <android/bitmap.h>
 #include <cmath>
+#include <android/log.h>
+
 
 jobject createBitmap(JNIEnv *pEnv, int width, int height);
 
@@ -63,7 +65,6 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     uint32_t sideSize = calculateSideSize(lutBitmapInfo);
     uint32_t rgbDistortion = (COLOR_DEPTH / sideSize);
     uint32_t rowDepth = lutBitmapInfo.height / sideSize;
-    uint32_t columnDepth = lutBitmapInfo.width / sideSize;
     // 映射原始像素数组到 LUT 上
     for (int y = 0; y < bitmapInfo.height; y++) {
         for (int x = 0; x < bitmapInfo.width; x++) {
@@ -75,6 +76,7 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             uint8_t srcR = (srcPixel >> 16) & 0xff;
             uint8_t srcG = (srcPixel >> 8) & 0xff;
             uint8_t srcB = srcPixel & 0xff;
+
             //计算lut的index,进行了越界判断
             uint32_t pointX = srcR / rgbDistortion;
             uint32_t pointY = srcG / rgbDistortion;
@@ -84,14 +86,43 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             //根据lut的坐标计算lut的Index
             uint32_t lutIndex = lutY + lutBitmapInfo.width + lutX;
             //计算lut的rgb
-            uint8_t lutR = lutPixels[lutIndex] >> 16 & 0xff;
+            uint8_t lutR = (lutPixels[lutIndex] >> 16) & 0xff;
             uint8_t lutG = lutPixels[lutIndex] >> 8 & 0xff;
             uint8_t lutB = lutPixels[lutIndex] & 0xff;
+
+            if (x == 111 && y == 111) {
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: 100*100 坐标是 %d",
+                                    lutIndex);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: rgbDistortion %d",
+                                    rgbDistortion);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pixel %d",
+                                    srcPixel );
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: R %d",
+                                    srcR);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: G %d",
+                                    srcG);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: B %d",
+                                    srcB);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointX %d",
+                                    pointX);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointY %d",
+                                    pointY);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointZ %d",
+                                    pointZ);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: lutX %d",
+                                    lutX);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: lutY %d",
+                                    lutY);
+                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: index %d",
+                                    index);
+            }
             // 将处理后的像素值存储到新的 Bitmap 对象中
-//            uint32_t dstPixel =
-//                    (srcPixel & 0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
-            uint32_t dstPixel =
-                    (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+            uint32_t dstPixel = srcPixel;
+//            uint32_t dstPixel = (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
+            if (x > 0 && x < 1440 && y > 100 && y < 500) {
+                dstPixel = 0xff000000;
+            }
+
             dstPixels[index] = dstPixel;
         }
     }

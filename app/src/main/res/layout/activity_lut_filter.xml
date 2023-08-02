@@ -20,5 +20,11 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scaleType="fitCenter" />
+    <ImageView
+        android:id="@+id/iv_cpplut"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="fitCenter" />
 
 </LinearLayout>
