@@ -15,7 +15,8 @@ class ImageCropLayout : FrameLayout {
 
     init {
         val imageCropIndexView = ImageCropIndexView(context)
-
+        val imageCropMaterialView = ImageCropMaterialView(context)
+        addView(imageCropMaterialView)
         addView(imageCropIndexView)
     }
 
