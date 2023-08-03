@@ -96,9 +96,9 @@ public class LUTImage {
         int lutX = lutAlignment.getX(rowDepth, sideSize, x, y, z);
         int lutY = lutAlignment.getY(rowDepth, sideSize, x, y, z);
         Log.i(TAG, "applyLut: rgbDistortion " + rgbDistortion);
-        Log.i(TAG, "applyLut: R " + Color.red(pixelColor));
-        Log.i(TAG, "applyLut: G " + Color.green(pixelColor));
-        Log.i(TAG, "applyLut: B " + Color.blue(pixelColor));
+        Log.i(TAG, "applyLut: R " + Color.red(pixelColor) + "=" + Integer.toHexString(Color.red(pixelColor)));
+        Log.i(TAG, "applyLut: G " + Color.green(pixelColor) + "=" + Integer.toHexString(Color.green(pixelColor)));
+        Log.i(TAG, "applyLut: B " + Color.blue(pixelColor) + "=" + Integer.toHexString(Color.blue(pixelColor)));
         Log.i(TAG, "applyLut: pointX " + x);
         Log.i(TAG, "applyLut: pointY " + y);
         Log.i(TAG, "applyLut: pointZ " + z);

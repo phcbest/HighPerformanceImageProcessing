@@ -7,6 +7,16 @@
 #include <android/bitmap.h>
 #include <cmath>
 #include <android/log.h>
+#include <arpa/inet.h>
+
+#define MAKE_ABGR(a, b, g, r) (((a&0xff)<<24) | ((b & 0xff) << 16) | ((g & 0xff) << 8 ) | (r & 0xff))
+
+#define BGR_8888_A(p) ((p & (0xff<<24))   >> 24 )
+#define BGR_8888_B(p) ((p & (0xff << 16)) >> 16 )
+#define BGR_8888_G(p) ((p & (0xff << 8))  >> 8 )
+#define BGR_8888_R(p) (p & (0xff) )
+#define LOG_TAG "JNI-lutFilterImage"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
 
 jobject createBitmap(JNIEnv *pEnv, int width, int height);
@@ -66,64 +76,100 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
     uint32_t rgbDistortion = (COLOR_DEPTH / sideSize);
     uint32_t rowDepth = lutBitmapInfo.height / sideSize;
     // 映射原始像素数组到 LUT 上
-    for (int y = 0; y < bitmapInfo.height; y++) {
-        for (int x = 0; x < bitmapInfo.width; x++) {
-            //计算index
-            uint32_t index = y * bitmapInfo.width + x;
-            // 获取原始像素值
-            uint32_t srcPixel = srcPixels[index];
-            // 分离原始像素的颜色通道
-            uint8_t srcR = (srcPixel >> 16) & 0xff;
-            uint8_t srcG = (srcPixel >> 8) & 0xff;
-            uint8_t srcB = srcPixel & 0xff;
-
-            //计算lut的index,进行了越界判断
-            uint32_t pointX = srcR / rgbDistortion;
-            uint32_t pointY = srcG / rgbDistortion;
-            uint32_t pointZ = srcB / rgbDistortion;
-            uint32_t lutX = getX(rowDepth, sideSize, pointX, pointY, pointZ);
-            uint32_t lutY = getY(rowDepth, sideSize, pointX, pointY, pointZ);
-            //根据lut的坐标计算lut的Index
-            uint32_t lutIndex = lutY + lutBitmapInfo.width + lutX;
-            //计算lut的rgb
-            uint8_t lutR = (lutPixels[lutIndex] >> 16) & 0xff;
-            uint8_t lutG = lutPixels[lutIndex] >> 8 & 0xff;
-            uint8_t lutB = lutPixels[lutIndex] & 0xff;
-
-            if (x == 111 && y == 111) {
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: 100*100 坐标是 %d",
-                                    lutIndex);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: rgbDistortion %d",
-                                    rgbDistortion);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pixel %d",
-                                    srcPixel );
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: R %d",
-                                    srcR);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: G %d",
-                                    srcG);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: B %d",
-                                    srcB);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointX %d",
-                                    pointX);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointY %d",
-                                    pointY);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointZ %d",
-                                    pointZ);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: lutX %d",
-                                    lutX);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: lutY %d",
-                                    lutY);
-                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: index %d",
-                                    index);
-            }
-            // 将处理后的像素值存储到新的 Bitmap 对象中
-            uint32_t dstPixel = srcPixel;
+//    for (int y = 0; y < bitmapInfo.height; y++) {
+//        for (int x = 0; x < bitmapInfo.width; x++) {
+//            //计算index
+//            uint32_t index = y * bitmapInfo.width + x;
+//            // 获取原始像素值
+//            uint32_t srcPixel = srcPixels[index];
+//            // 分离原始像素的颜色通道
+//            uint32_t srcB = (srcPixel >> 16) & 0xFF;
+//            uint32_t srcG = (srcPixel >> 8) & 0xFF;
+//            uint32_t srcR = srcPixel & 0xFF;
+//            uint32_t alpha = (srcPixel >> 24) & 0xFF;
+//
+//            //计算lut的index,进行了越界判断
+//            uint32_t pointX = srcR / rgbDistortion;
+//            uint32_t pointY = srcG / rgbDistortion;
+//            uint32_t pointZ = srcB / rgbDistortion;
+//            uint32_t lutX = getX(rowDepth, sideSize, pointX, pointY, pointZ);
+//            uint32_t lutY = getY(rowDepth, sideSize, pointX, pointY, pointZ);
+//            //根据lut的坐标计算lut的Index
+//            uint32_t lutIndex = lutY + lutBitmapInfo.width + lutX;
+//            //计算lut的rgb
+//            uint8_t lutR = (lutPixels[lutIndex] >> 16) & 0xff;
+//            uint8_t lutG = lutPixels[lutIndex] >> 8 & 0xff;
+//            uint8_t lutB = lutPixels[lutIndex] & 0xff;
+//
+//            if (x == 111 && y == 111) {
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: 100*100 坐标是 %d",
+//                                    lutIndex);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: rgbDistortion %d",
+//                                    rgbDistortion);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pixel 大端序 %d",
+//                                    srcPixel);
+//
+//                // 在C层中，Bitmap像素点的值是ABGR，而不是ARGB，也就是说，高端到低端：A，B，G，R
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: R %d",
+//                                    srcR);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: G %d",
+//                                    srcG);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: B %d",
+//                                    srcB);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointX %d",
+//                                    pointX);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointY %d",
+//                                    pointY);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: pointZ %d",
+//                                    pointZ);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: lutX %d",
+//                                    lutX);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: lutY %d",
+//                                    lutY);
+//                __android_log_print(ANDROID_LOG_DEBUG, "JNI_LOG_TAG", "applyLut: index %d",
+//                                    index);
+//            }
+//            // 将处理后的像素值存储到新的 Bitmap 对象中
+////            uint32_t dstPixel = srcPixel;
 //            uint32_t dstPixel = (0xff000000) | (lutR << 16) | (lutG << 8) | lutB;
-            if (x > 100 && x < 500 && y > 100 && y < 500) {
-                dstPixel = 0xff000000;
+//            if (x > 100 && x < 500 && y > 100 && y < 500) {
+//                dstPixel = 0xff000000;
+//            }
+//
+//            dstPixels[index] = dstPixel;
+//        }
+//    }
+    LOGD("jni 图片宽%d高%d", bitmapInfo.width, bitmapInfo.height);
+
+    for (int i = 0; i < bitmapInfo.height; ++i) {
+        for (int j = 0; j < bitmapInfo.width; ++j) {
+            uint32_t index = bitmapInfo.width * i + j;
+            uint32_t color = srcPixels[index];
+            uint32_t blue = (color >> 16) & 0xFF;
+            uint32_t green = (color >> 8) & 0xFF;
+            uint32_t red = color & 0xFF;
+            uint32_t alpha = (color >> 24) & 0xFF;
+
+            red = 255 - red;
+            green = 255 - green;
+            blue = 255 - blue;
+
+            if (i == 111 && j == 111) {
+                LOGD("jni color %d=%x", color, color);
+                LOGD("jni red %d=%x", red, red);
+                LOGD("jni green %d=%x", green, green);
+                LOGD("jni blue %d=%x", blue, blue);
+                LOGD("jni alpha %d=%x", alpha, alpha);
             }
 
-            dstPixels[index] = dstPixel;
+            uint32_t newColor =
+                    (alpha << 24) | ((blue << 16)) | ((green << 8)) | red;
+
+            if (i == 111 & j == 111) {
+                LOGD("newColor %d=%x", newColor, newColor);
+            }
+
+            dstPixels[index] = newColor;
         }
     }
 
