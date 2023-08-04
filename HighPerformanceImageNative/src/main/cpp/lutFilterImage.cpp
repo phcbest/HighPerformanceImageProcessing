@@ -140,7 +140,7 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
 //        }
 //    }
     LOGD("jni 图片宽%d高%d", bitmapInfo.width, bitmapInfo.height);
-
+    // 在C层中，Bitmap像素点的值是ABGR，而不是ARGB，也就是说，高端到低端：A，B，G，R
     for (int i = 0; i < bitmapInfo.height; ++i) {
         for (int j = 0; j < bitmapInfo.width; ++j) {
             uint32_t index = bitmapInfo.width * i + j;
@@ -150,9 +150,9 @@ jobject getLutFilterImage(JNIEnv *pEnv, jobject thiz, jobject bitmap, jobject lu
             uint32_t red = color & 0xFF;
             uint32_t alpha = (color >> 24) & 0xFF;
 
-            red = 255 - red;
-            green = 255 - green;
-            blue = 255 - blue;
+//            red = 255 - red;
+//            green = 255 - green;
+//            blue = 255 - blue;
 
             if (i == 111 && j == 111) {
                 LOGD("jni color %d=%x", color, color);

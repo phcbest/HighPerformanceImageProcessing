@@ -14,13 +14,16 @@ class LutFilterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_lut_filter)
         val assetManager = assets
         val testimage = assetManager.open("test_image.jpg")
+        val testimage2 = assetManager.open("test_image.jpg")
         val testlut = assetManager.open("test_lut.png")
         val filtersquare8nintendo = assetManager.open("filter_square_8_nintendo.png")
 
         val testimageBmp = BitmapFactory.decodeStream(testimage)
+        val testimageBmp2 = BitmapFactory.decodeStream(testimage2)
         val testlutBmp = BitmapFactory.decodeStream(testlut)
         val filtersquare8nintendoBmp = BitmapFactory.decodeStream(filtersquare8nintendo)
         testimage.close()
+        testimage2.close()
         testlut.close()
         filtersquare8nintendo.close()
 
@@ -30,7 +33,7 @@ class LutFilterActivity : AppCompatActivity() {
             filter.apply(testimageBmp)
 
         val imageByLutFilter =
-            ImageHelper.getImageByLutFilter(testimageBmp, filtersquare8nintendoBmp)
+            ImageHelper.getImageByLutFilter(testimageBmp2, filtersquare8nintendoBmp)
         findViewById<ImageView>(R.id.iv_origin).setImageBitmap(testimageBmp)
         findViewById<ImageView>(R.id.iv_lut).setImageBitmap(applyFilterImage)
         findViewById<ImageView>(R.id.iv_cpplut).setImageBitmap(imageByLutFilter)

@@ -2,6 +2,7 @@ package org.phcbest.highperformanceimagenative.easylut.filter;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.widget.ImageView;
 
 import org.phcbest.highperformanceimagenative.easylut.lutimage.CoordinateToColor;
@@ -27,6 +28,8 @@ public abstract class LUTFilter implements Filter {
     public Bitmap apply(Bitmap src) {
         Bitmap lutBitmap = getLUTBitmap();
         LUTImage lutImage = LUTImage.createLutImage(lutBitmap, coordinateToColorType, lutAlignmentMode);
+        int pixel = src.getPixel(111, 111);
+        Log.i("TAG", "apply:  src.getPixel "+pixel);
         return strategy.applyLut(src, lutImage);
     }
 
