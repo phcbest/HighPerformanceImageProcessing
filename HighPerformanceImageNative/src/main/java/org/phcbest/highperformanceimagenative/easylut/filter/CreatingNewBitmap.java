@@ -17,20 +17,12 @@ public class CreatingNewBitmap implements BitmapStrategy {
         src.getPixels(pix, 0, mWidth, 0, 0, mWidth, mHeight);//bitmap 原生方法,将图片所有的像素信息读取到数组中
 
         //从上到下,从左到右遍历原图
-        Log.i(TAG, "applyLut: 图片宽"+mWidth+"高"+mHeight);
+        Log.i(TAG, "applyLut: 图片宽" + mWidth + "高" + mHeight);
         for (int y = 0; y < mHeight; y++) {
             for (int x = 0; x < mWidth; x++) {
                 int index = y * mWidth + x;
                 int pixel = pix[index];
                 pix[index] = lutImage.getColorPixelOnLut(pixel);
-                if (x == 111 && y == 111) {
-                    lutImage.getColorPixelOnLutLog(pixel);
-                    Log.i(TAG, "applyLut: index" + index);
-                    Log.i(TAG, "applyLut: pixel" + pixel + "=" + Integer.toHexString(pixel));
-                }
-                if (x > 100 && x < 500 && y > 100 && y < 500) {
-                    pix[index] = 0xff000000;
-                }
             }
         }
         Bitmap bm = Bitmap.createBitmap(mWidth, mHeight, src.getConfig());

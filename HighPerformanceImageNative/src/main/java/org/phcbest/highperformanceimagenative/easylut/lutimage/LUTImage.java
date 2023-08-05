@@ -66,12 +66,6 @@ public class LUTImage {
         return getPixelByIndex(lutIndex);
     }
 
-    public int getColorPixelOnLutLog(int pixelColor) {
-        int lutIndex = getLutPixelIndex(pixelColor);
-        getLutPixelIndexLOG(lutIndex);
-        Log.i(TAG, "applyLut: 100*100 坐标是" + lutIndex);
-        return getPixelByIndex(lutIndex);
-    }
 
     int getPixelByIndex(int lutIndex) {
         int red = ((lutColors[lutIndex] >> 16) & 0xff);
@@ -89,23 +83,6 @@ public class LUTImage {
         return lutY * lutWidth + lutX;
     }
 
-    private int getLutPixelIndexLOG(int pixelColor) {
-        int x = DistortedColor.getColorOnXCoordinate(this, pixelColor);
-        int y = DistortedColor.getColorOnYCoordinate(this, pixelColor);
-        int z = DistortedColor.getColorOnZCoordinate(this, pixelColor);
-        int lutX = lutAlignment.getX(rowDepth, sideSize, x, y, z);
-        int lutY = lutAlignment.getY(rowDepth, sideSize, x, y, z);
-        Log.i(TAG, "applyLut: rgbDistortion " + rgbDistortion);
-        Log.i(TAG, "applyLut: R " + Color.red(pixelColor) + "=" + Integer.toHexString(Color.red(pixelColor)));
-        Log.i(TAG, "applyLut: G " + Color.green(pixelColor) + "=" + Integer.toHexString(Color.green(pixelColor)));
-        Log.i(TAG, "applyLut: B " + Color.blue(pixelColor) + "=" + Integer.toHexString(Color.blue(pixelColor)));
-        Log.i(TAG, "applyLut: pointX " + x);
-        Log.i(TAG, "applyLut: pointY " + y);
-        Log.i(TAG, "applyLut: pointZ " + z);
-        Log.i(TAG, "applyLut: lutX " + lutX);
-        Log.i(TAG, "applyLut: lutY " + lutY);
-        return lutY * lutWidth + lutX;
-    }
 
     @Override
     public String toString() {

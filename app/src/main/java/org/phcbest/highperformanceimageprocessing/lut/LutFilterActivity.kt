@@ -16,15 +16,17 @@ class LutFilterActivity : AppCompatActivity() {
         val testimage = assetManager.open("test_image.jpg")
         val testimage2 = assetManager.open("test_image.jpg")
         val testlut = assetManager.open("test_lut.png")
+        val testlut2 = assetManager.open("test_lut.png")
         val filtersquare8nintendo = assetManager.open("filter_square_8_nintendo.png")
 
         val testimageBmp = BitmapFactory.decodeStream(testimage)
         val testimageBmp2 = BitmapFactory.decodeStream(testimage2)
         val testlutBmp = BitmapFactory.decodeStream(testlut)
-        val filtersquare8nintendoBmp = BitmapFactory.decodeStream(filtersquare8nintendo)
+        val filtersquare8nintendoBmp = BitmapFactory.decodeStream(testlut2)
         testimage.close()
         testimage2.close()
         testlut.close()
+        testlut2.close()
         filtersquare8nintendo.close()
 
         val filter = EasyLUT.fromBitmap()
