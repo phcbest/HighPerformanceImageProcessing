@@ -13,6 +13,9 @@
         android:theme="@style/Theme.HighPerformanceImageProcessing"
         tools:targetApi="31">
         <activity
+            android:name=".encryptBitmap.EncrypyBitmapActivity"
+            android:exported="false" />
+        <activity
             android:name=".lut.LutFilterActivity"
             android:exported="false" />
         <activity
