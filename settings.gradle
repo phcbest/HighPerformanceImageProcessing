@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "HighPerformanceImageProcessing"
 include ':app'
 include ':HighPerformanceImageNative'
+include ':HighPerformanceImageNative:ImageCrop'
