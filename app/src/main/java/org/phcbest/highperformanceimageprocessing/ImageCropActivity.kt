@@ -23,8 +23,9 @@ class ImageCropActivity : AppCompatActivity() {
         val demo = File(PathUtils.getExternalAppCachePath(), "demo.png").toUri()
         val outPath = File(PathUtils.getExternalAppCachePath(), "output.png").toUri()
         mUcrop.cropImageView.setImageUri(demo, outPath)
+        mUcrop.cropImageView.setMaxScaleMultiplier(100F)
         mUcrop.overlayView.freestyleCropMode =
-            OverlayView.FREESTYLE_CROP_MODE_ENABLE_WITH_PASS_THROUGH
+            OverlayView.FREESTYLE_CROP_MODE_ENABLE
         mUcrop.overlayView.setTargetAspectRatio(16F / 9F)
         mUcrop.overlayView.setCropRectMinWH(
             (Pair(
