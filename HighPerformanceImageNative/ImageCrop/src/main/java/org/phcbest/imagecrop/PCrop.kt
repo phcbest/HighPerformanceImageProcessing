@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
 import android.widget.FrameLayout
 
 /**
@@ -36,15 +35,20 @@ class PCrop : FrameLayout {
     fun setInputOutput(input: Uri, output: Uri) {
         inputUri = input
         outputUri = output
+        reSetImage()
     }
-
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return true
     }
 
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         return super.onTouchEvent(event)
+    }
+
+    private fun reSetImage() {
+        pCropImage.setImage(inputUri, 2000 to 2000)
     }
 
 }
