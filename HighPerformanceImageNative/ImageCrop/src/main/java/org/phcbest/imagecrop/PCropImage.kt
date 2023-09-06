@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.net.Uri
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,23 +37,34 @@ internal class PCropImage : View {
         }
     }
 
+    private var originToDstScale = 1F
     fun setImage(inputUri: Uri?, limitPixelSize: Pair<Int, Int>? = null) {
         CoroutineScope(Dispatchers.Default).launch {
             inputUri?.encodedPath?.let {
                 val originBitmap =
                     BitmapFactory.decodeStream(context.contentResolver.openInputStream(inputUri))
                 dstImage = if (limitPixelSize != null) {
-                    val scaleThanWH =
+                    originToDstScale =
                         Rect(0, 0, limitPixelSize.first, limitPixelSize.second).scaleThanWH(originBitmap.width, originBitmap.height)
                     Bitmap.createScaledBitmap(
                         originBitmap,
-                        (originBitmap.width * scaleThanWH).toInt(),
-                        (originBitmap.height * scaleThanWH).toInt(),
+                        (originBitmap.width * originToDstScale).toInt(),
+                        (originBitmap.height * originToDstScale).toInt(),
                         true
                     )
                 } else {
+                    originToDstScale = 1F
                     originBitmap
                 }
+                //计算bitmap放入view的矩阵大小,居中
+                val viewRect = Rect()
+                this@PCropImage.getDrawingRect(viewRect)
+                val scaleThanWH = viewRect.scaleThanWH(dstImage!!.width, dstImage!!.height)
+                bitmapMatrix.postScale(scaleThanWH, scaleThanWH)
+                bitmapMatrix.postTranslate(
+                    (viewRect.width() - dstImage!!.width * scaleThanWH) / 2F,
+                    (viewRect.height() - dstImage!!.height * scaleThanWH) / 2F
+                )
                 withContext(Dispatchers.Main) {
                     invalidate()
                 }
