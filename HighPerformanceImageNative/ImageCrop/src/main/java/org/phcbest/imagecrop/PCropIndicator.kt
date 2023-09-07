@@ -31,6 +31,12 @@ internal class PCropIndicator : View {
             doSelectBoxChange()
         }
 
+    /**
+     * minimumLimit
+     * first is width
+     * second is height
+     */
+    private var boxMinimumLimit: Pair<Float, Float> = 100.dpF to 100.dpF
 
     private fun doSelectBoxChange() {
 
@@ -40,7 +46,7 @@ internal class PCropIndicator : View {
     private var selectPosition = -1
 
     /**
-     * 位移点示意图
+     * schematic diagram of displacement point
      *
      *  0------1
      *  |      |
@@ -86,28 +92,60 @@ internal class PCropIndicator : View {
             0 -> {
                 boxRectF.top += yTrans
                 boxRectF.left += xTrans
+                leftLimit()
+                topLimit()
             }
 
             1 -> {
                 boxRectF.top += yTrans
                 boxRectF.right += xTrans
+                rightLimit()
+                topLimit()
             }
 
             2 -> {
                 boxRectF.bottom += yTrans
                 boxRectF.right += xTrans
+                rightLimit()
+                bottomLimit()
             }
 
             3 -> {
                 boxRectF.bottom += yTrans
                 boxRectF.left += xTrans
+                leftLimit()
+                bottomLimit()
             }
         }
         invalidate()
         lastPointF.set(event.x, event.y)
     }
 
-    private var clickTolerance = 10.dp
+    private fun bottomLimit() {
+        if (boxRectF.height() < boxMinimumLimit.second) {
+            boxRectF.bottom = boxRectF.top + boxMinimumLimit.second
+        }
+    }
+
+    private fun rightLimit() {
+        if (boxRectF.width() < boxMinimumLimit.first) {
+            boxRectF.right = boxRectF.left + boxMinimumLimit.first
+        }
+    }
+
+    private fun topLimit() {
+        if (boxRectF.height() < boxMinimumLimit.second) {
+            boxRectF.top = boxRectF.bottom - boxMinimumLimit.second
+        }
+    }
+
+    private fun leftLimit() {
+        if (boxRectF.width() < boxMinimumLimit.first) {
+            boxRectF.left = boxRectF.right - boxMinimumLimit.first
+        }
+    }
+
+    private var clickTolerance = 15.dp
     private fun clickCorner(pointf: PointF): Int {
         if (pointf.y in boxRectF.top - clickTolerance..boxRectF.top + clickTolerance &&
             pointf.x in boxRectF.left - clickTolerance..boxRectF.left + clickTolerance
