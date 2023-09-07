@@ -44,7 +44,11 @@ class PCrop : FrameLayout {
 
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return super.onTouchEvent(event)
+        if (event == null) {
+            return true
+        }
+        pCropIndicator.scaleBox(event)
+        return true
     }
 
     private fun reSetImage() {
