@@ -4,13 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -25,8 +23,17 @@ internal class PCropIndicator : View {
         defStyleAttr
     )
 
-    var enableProportionalScale = true
-    var widthThanHeight: Pair<Int, Int> = Pair(1, 1)
+    /**
+     * restricted scaling can only be proportional
+     */
+    var enableAspectRatioScale = true
+
+    /**
+     * aspectRatio
+     * first is width
+     * second is height
+     */
+    var aspectRatio: Pair<Int, Int> = Pair(1, 1)
         set(value) {
             field = value
             doSelectBoxChange()
@@ -93,61 +100,39 @@ internal class PCropIndicator : View {
             0 -> {
                 boxRectF.top += yTrans
                 boxRectF.left += xTrans
-                leftLimit()
-                topLimit()
+                BoxHelper.leftLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.topLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.limitAspectTop(boxRectF, enableAspectRatioScale, aspectRatio)
             }
 
             1 -> {
                 boxRectF.top += yTrans
                 boxRectF.right += xTrans
-                rightLimit()
-                topLimit()
+                BoxHelper.rightLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.topLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.limitAspectTop(boxRectF, enableAspectRatioScale, aspectRatio)
             }
 
             2 -> {
                 boxRectF.bottom += yTrans
                 boxRectF.right += xTrans
-                rightLimit()
-                bottomLimit()
+                BoxHelper.rightLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.bottomLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.limitAspectBottom(boxRectF, enableAspectRatioScale, aspectRatio)
             }
 
             3 -> {
                 boxRectF.bottom += yTrans
                 boxRectF.left += xTrans
-                leftLimit()
-                bottomLimit()
+                BoxHelper.leftLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.bottomLimit(boxRectF, boxMinimumLimit)
+                BoxHelper.limitAspectBottom(boxRectF, enableAspectRatioScale, aspectRatio)
             }
         }
         invalidate()
         lastPointF.set(event.x, event.y)
     }
 
-    private fun bottomLimit() {
-        if (boxRectF.height() < boxMinimumLimit.second) {
-            boxRectF.bottom = boxRectF.top + boxMinimumLimit.second
-        }
-        if (enableProportionalScale) {
-            
-        }
-    }
-
-    private fun rightLimit() {
-        if (boxRectF.width() < boxMinimumLimit.first) {
-            boxRectF.right = boxRectF.left + boxMinimumLimit.first
-        }
-    }
-
-    private fun topLimit() {
-        if (boxRectF.height() < boxMinimumLimit.second) {
-            boxRectF.top = boxRectF.bottom - boxMinimumLimit.second
-        }
-    }
-
-    private fun leftLimit() {
-        if (boxRectF.width() < boxMinimumLimit.first) {
-            boxRectF.left = boxRectF.right - boxMinimumLimit.first
-        }
-    }
 
     private var clickTolerance = 15.dp
     private fun clickCorner(pointf: PointF): Int {
