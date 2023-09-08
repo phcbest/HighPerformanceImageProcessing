@@ -25,6 +25,7 @@ internal class PCropIndicator : View {
         defStyleAttr
     )
 
+    var enableProportionalScale = true
     var widthThanHeight: Pair<Int, Int> = Pair(1, 1)
         set(value) {
             field = value
@@ -124,6 +125,9 @@ internal class PCropIndicator : View {
     private fun bottomLimit() {
         if (boxRectF.height() < boxMinimumLimit.second) {
             boxRectF.bottom = boxRectF.top + boxMinimumLimit.second
+        }
+        if (enableProportionalScale) {
+            
         }
     }
 
