@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -23,6 +24,12 @@ internal class PCropIndicator : View {
         defStyleAttr
     )
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+    }
+
     /**
      * restricted scaling can only be proportional
      */
@@ -38,6 +45,7 @@ internal class PCropIndicator : View {
             field = value
             doSelectBoxChange()
         }
+
 
     /**
      * minimumLimit
@@ -129,6 +137,7 @@ internal class PCropIndicator : View {
                 BoxHelper.limitAspectBottom(boxRectF, enableAspectRatioScale, aspectRatio)
             }
         }
+        BoxHelper.limitInRect(boxRectF, Rect(0, 0, width, height),selectPosition)
         invalidate()
         lastPointF.set(event.x, event.y)
     }
